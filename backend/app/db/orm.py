@@ -1,6 +1,8 @@
 from enum import Enum, auto
 import os
 from pydoc import cli
+from typing import Dict, List
+
 from ..models import Resource, Instance, Category, Client, Configuration, Consumption, ResourceConfiguration
 from .error import InvalidObject, FileNotFound
 import xml.dom.minidom
@@ -11,7 +13,7 @@ ModelType =  Resource | Instance | Category | Client | Configuration | Consumpti
 
 class Orm ():
 
-    tables = {
+    tables : Dict[str, List[ModelType]] = {
         "resources" : [],
         "configurations" : [],
         "categories" : [],
@@ -22,6 +24,24 @@ class Orm ():
 
     def __init__(self) -> None:
         pass
+
+    @classmethod
+    def searchById(cls, table : str, id_: str):
+
+        # special search for: consumptions
+        if table == "consumptions":
+            consumptions = []
+            for item in cls.tables[table]:
+                if item.instance_id == id_:
+                    consumptions.append(item)
+            return consumptions 
+
+        for item in cls.tables[table]:
+            if item.id_ == id_:
+                return item
+
+        print('No se encontró el objeto')
+        return None
 
     @classmethod
     def init(cls):
@@ -40,7 +60,7 @@ class Orm ():
 
         # read from db file
         project_path = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(project_path, 'backend', 'app', 'db','db.xml')
+        db_path = os.path.join(project_path, 'db.xml')
 
         print(db_path)
 
@@ -71,12 +91,14 @@ class Orm ():
             configuration_description = configuration_tag.getElementsByTagName('descripcion')[0].firstChild.nodeValue
 
             configuration_resources_configuration = []
-            configuration_resources_tags = configuration_tag.getElementsByTagName("recurso")
+            configuration_resources_tags = configuration_tag.getElementsByTagName("recursoConfiguracion")
 
             for configuration_resources_tag in configuration_resources_tags:
                 # search resources 
                 resource_id = configuration_resources_tag.getAttribute('id')
-                resource = cls.searchById(resource_id)
+                resource = cls.searchById("resources", resource_id)
+                if resource == None:
+                    continue
                 resource_quantity = float(configuration_resources_tag.firstChild.nodeValue)
                 configuration_resources_configuration.append(ResourceConfiguration( resource_quantity,resource))
 
@@ -91,15 +113,18 @@ class Orm ():
             category_id = category_tag.getAttribute('id')
             category_name = category_tag.getElementsByTagName('nombre')[0].firstChild.nodeValue
             category_description = category_tag.getElementsByTagName('descripcion')[0].firstChild.nodeValue
-            category_work_load = float(category_tag.getElementsByTagName('cargaTrabajo')[0].firstChild.nodeValue)
+            category_work_load = category_tag.getElementsByTagName('cargaTrabajo')[0].firstChild.nodeValue
             
             
             category_configurations = []
-            category_configurations_tags = category_tag.getElementsByTagName("configuracion")
+            category_configurations_tags = category_tag.getElementsByTagName("configuracionCategoria")
             for category_configurations_tag in category_configurations_tags:
                 # search configurations 
                 configuration_id = category_configurations_tag.getAttribute('id')
-                category_configurations.append(cls.searchById())
+                configuration = cls.searchById("configurations", configuration_id)
+                if configuration == None:
+                    continue
+                category_configurations.append(configuration)
 
             cls.tables["categories"].append(Category(category_id,category_name, category_description, category_work_load, category_configurations))
                 
@@ -113,7 +138,7 @@ class Orm ():
             consumption_instance_id = consumption_tag.getAttribute('idInstancia')
             consumption_time = float(consumption_tag.getElementsByTagName('tiempo')[0].firstChild.nodeValue)
             # ? parse to datetime
-            consumption_date = consumption_tag.getElementsByTagName('fecha')[0].firstChild.nodeValue
+            consumption_date = consumption_tag.getElementsByTagName('fechaHora')[0].firstChild.nodeValue
 
             cls.tables["consumptions"].append(Consumption(consumption_client_nit, consumption_instance_id, consumption_time, consumption_date))
 
@@ -134,18 +159,21 @@ class Orm ():
                 
                 # ? parse to datetime
                 # ? None if not exists
-                instance_end_date = instance_tag.getElementsByTagName('fechaFinal')[0].firstChild.nodeValue
+                # instance_end_date = instance_tag.getElementsByTagName('fechaFinal')[0].firstChild.nodeValue
+                instance_end_date = None
 
                 # search configuration
                 instance_configuration_id = instance_tag.getElementsByTagName('idConfiguracion')[0].firstChild.nodeValue
-                instance_configuration = cls.searchById()
+                instance_configuration = cls.searchById("configurations", instance_configuration_id)
+
+                if instance_configuration == None:
+                    continue
 
                 # search consumption -> special search
-                instance_consupmtions = cls.searchById()
+                instance_consupmtions = cls.searchById("consumptions", instance_id)
 
-                instance_configuration = cls.searchById()
 
-                cls.tables["instances"].append(Instance(instance_id, instance_configuration, instance_name, instance_start_date, instance_state, instance_end_date,))
+                cls.tables["instances"].append(Instance(instance_id, instance_configuration, instance_name, instance_start_date, instance_state, instance_end_date,instance_consupmtions))
 
         # * Fill clients table
 
@@ -160,14 +188,19 @@ class Orm ():
             client_email = client_tag.getElementsByTagName('correoElectronico')[0].firstChild.nodeValue
 
             client_instances = []
-            client_instances_tags = category_tag.getElementsByTagName("instancia")
+            client_instances_tags = client_tag.getElementsByTagName("instanciaCliente")
             for client_instances_tag in client_instances_tags:
                 # search instances 
                 instance_id = client_instances_tag.getAttribute('id')
-                client_instances.append(cls.searchById())
+                instance = cls.searchById("instances", instance_id)
+                if instance == None:
+                    continue
+
+                client_instances.append(instance)
 
             cls.tables["clients"].append(Client(client_nit, client_name, client_username, client_password, client_direction, client_email, client_instances))
 
+        print('Se cargaron los datos correctamente')
                 
 
     @classmethod
