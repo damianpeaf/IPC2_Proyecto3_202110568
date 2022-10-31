@@ -9,3 +9,5 @@ class InvalidObject(Exception):
 class FileNotFound(Exception):
     pass
 
+class IdRegisteredError(Exception):
+    pass

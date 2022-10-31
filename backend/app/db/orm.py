@@ -4,7 +4,7 @@ import xml.dom.minidom
 
 import xml.etree.ElementTree as ET
 from ..models import Resource, Instance, Category, Client, Configuration, Consumption, ResourceConfiguration
-from .error import InvalidObject, FileNotFound
+from .error import IdRegisteredError
 
 
 ModelType =  Resource | Instance | Category | Client | Configuration | Consumption
@@ -27,17 +27,42 @@ class Orm ():
         pass
 
     @classmethod
-    def searchById(cls, table : str, id_: str):
+    def create(cls, table_name:str, object:ModelType):
+        # special create for: consumptions
+        if table_name == "consumptions":
+            cls.tables[table_name].append(object) 
+            return 
+
+        for item in cls.tables[table_name]:
+            if item.id_ == object.id_:
+                raise IdRegisteredError(f'Id {object.id_} ya registrada')
+                return 
+
+        cls.tables[table_name].append(object) 
+
+    @classmethod
+    def search_all(cls, table_name:str, id_: str):
+        # ? change special search here
+        if table_name == "consumptions":
+            return 
+
+        registers = []
+        for item in cls.tables[table_name]:
+            if item.id_ == id_:
+                registers.append(item)
+
+    @classmethod
+    def searchById(cls, table_name : str, id_: str):
 
         # special search for: consumptions
-        if table == "consumptions":
+        if table_name == "consumptions":
             consumptions = []
-            for item in cls.tables[table]:
+            for item in cls.tables[table_name]:
                 if item.instance_id == id_:
                     consumptions.append(item)
             return consumptions 
 
-        for item in cls.tables[table]:
+        for item in cls.tables[table_name]:
             if item.id_ == id_:
                 return item
 
