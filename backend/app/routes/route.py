@@ -1,6 +1,6 @@
 import json
 from flask import Blueprint, jsonify, request
-from ..controller import fetch_all_data, create_resource, create_category, create_configuration, create_client, create_instance
+from ..controller import fetch_all_data, create_resource, create_category, create_configuration, create_client, create_instance, create_consumption
 
 default_routes = Blueprint("main", __name__)
 
@@ -35,7 +35,11 @@ def create_client_():
 @default_routes.route('/crearInstancia', methods=['POST'])
 def create_instance_():
     res = create_instance(request.json)
-    json.dumps(res, indent=4, sort_keys=True, default=str)
+    return jsonify(res)
 
+@default_routes.route('/crearConsumo', methods=['POST'])
+def create_consumption_():
+    res = create_consumption(request.json)
+    
     return jsonify(res)
 

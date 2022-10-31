@@ -4,3 +4,4 @@ from .create_category import create_category
 from .create_configuration import create_configuration
 from .create_client import create_client
 from .create_instance import create_instance
+from .create_consumption import create_consumption

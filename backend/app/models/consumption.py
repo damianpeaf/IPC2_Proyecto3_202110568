@@ -6,4 +6,4 @@ class Consumption():
     client_nit : str
     instance_id : str   
     time: float
-    date: datetime
+    date: str

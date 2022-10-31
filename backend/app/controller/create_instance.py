@@ -14,7 +14,7 @@ def create_instance(fields:Dict):
     try:
         id_ = get_value(fields, 'id', str)
         name = get_value(fields, 'name', str)
-        init_date = datetime.now()
+        init_date = datetime.now().strftime("%d/%m/%Y")
         state = "Vigente"
         end_date = None
         consumptions = []
