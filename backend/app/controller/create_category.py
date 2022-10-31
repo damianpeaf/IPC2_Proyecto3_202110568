@@ -24,6 +24,7 @@ def create_category(fields:Dict):
 
             if conf == None:
                 raise ConfigurationNotFound(f'No se encontró configuration con la id {configuration_id}')
+            configurations_objects.append(conf)
 
         new_category = Category(id_, name, description, work_load, configurations_objects)
 
@@ -31,8 +32,8 @@ def create_category(fields:Dict):
         Orm.save()
 
         return {
-            'msg': 'Recurso creado exitosamente',
-            'resource': asdict(new_category)
+            'msg': 'Categoria creado exitosamente',
+            'category': asdict(new_category)
         }
 
     except Exception as e:

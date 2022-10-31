@@ -5,10 +5,6 @@ from .consumption import Consumption
 from datetime import datetime
 from enum import Enum, auto
 
-class InstanceState(Enum):
-    Vigente = auto()
-    Cancelada = auto()
-
 
 @dataclass
 class Instance():
@@ -16,6 +12,6 @@ class Instance():
     configuration: Configuration
     name: str
     init_date: datetime
-    state: InstanceState
+    state: str
     end_date : datetime | None
     consumptions : List[Consumption]

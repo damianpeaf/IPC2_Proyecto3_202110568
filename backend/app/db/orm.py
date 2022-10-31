@@ -62,6 +62,14 @@ class Orm ():
                     consumptions.append(item)
             return consumptions 
 
+        # search for clients
+
+        if table_name == "clients":
+            for item in cls.tables[table_name]:
+                    if item.nit == id_:
+                        return item
+            return None 
+
         for item in cls.tables[table_name]:
             if item.id_ == id_:
                 return item
