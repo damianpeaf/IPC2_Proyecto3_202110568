@@ -3,7 +3,7 @@ import xml.dom.minidom
 
 from ..models import Resource, Category, Configuration, Instance, Client, ResourceConfiguration
 from ..db import Orm
-
+from ..utils import eval_date_string
 
 
 def read_configuration_file(files : Dict):
@@ -92,8 +92,19 @@ def read_configuration_file(files : Dict):
                 instance_state = client_instances_tag.getElementsByTagName('estado')[0].firstChild.nodeValue
                 instance_start_date = client_instances_tag.getElementsByTagName('fechaInicio')[0].firstChild.nodeValue
                 
+                date = instance_start_date
+                instance_start_date = eval_date_string(instance_start_date)
+
+                if instance_start_date == None:
+                    raise FileError(f'La fecha inicial {date} para la instancia con id {instance_id} no tiene el formato requerido')
+                    
                 instance_end_date = client_instances_tag.getElementsByTagName('fechaFinal')[0].firstChild.nodeValue if client_instances_tag.getElementsByTagName('fechaFinal')[0].firstChild else "-"
                 instance_end_date = instance_end_date if instance_end_date != '-' else  None
+                if instance_end_date != None:
+                    date = instance_end_date
+                    instance_end_date = eval_date_string(instance_end_date)
+                    if instance_end_date == None:
+                        raise FileError(f'La fecha final {date} para la instancia con id {instance_id} no tiene el formato requerido')
                 
                 # search configuration
                 instance_configuration_id = client_instances_tag.getElementsByTagName('idConfiguracion')[0].firstChild.nodeValue
@@ -168,14 +179,15 @@ def read_configuration_file(files : Dict):
         return {
             'msg': 'El archivo de configuración es requerido'
         }
-    except IndexError:
-        return {
-            'msg': 'El archivo de configuración tiene una estructura incorrecta'
-        }
     except FileError as e:
         return {
             'msg': str(e)
         }
+    except:
+        return {
+            'msg': 'El archivo de configuración tiene una estructura incorrecta'
+        }
+
 
 
 def hard_search(table_name : str, id_: str, not_created_list :List):
