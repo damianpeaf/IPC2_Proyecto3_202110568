@@ -12,3 +12,5 @@ app.register_blueprint(default_routes)
 
 # Init db
 Orm.init()
+Orm.save()
+

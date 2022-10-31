@@ -1,17 +1,18 @@
-from enum import Enum, auto
 import os
-from pydoc import cli
 from typing import Dict, List
+import xml.dom.minidom
 
+import xml.etree.ElementTree as ET
 from ..models import Resource, Instance, Category, Client, Configuration, Consumption, ResourceConfiguration
 from .error import InvalidObject, FileNotFound
-import xml.dom.minidom
 
 
 ModelType =  Resource | Instance | Category | Client | Configuration | Consumption
 
 
 class Orm ():
+
+    DB_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'db.xml')
 
     tables : Dict[str, List[ModelType]] = {
         "resources" : [],
@@ -59,12 +60,8 @@ class Orm ():
         
 
         # read from db file
-        project_path = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(project_path, 'db.xml')
 
-        print(db_path)
-
-        domTree = xml.dom.minidom.parse(db_path)
+        domTree = xml.dom.minidom.parse(cls.DB_FILE_PATH)
         group = domTree.documentElement
 
         # * Fill resource tables
@@ -148,32 +145,32 @@ class Orm ():
         instances_tags = group.getElementsByTagName("instancia")
         for instance_tag in instances_tags:
                 
-                instance_id = instance_tag.getAttribute('id')
-                instance_name = instance_tag.getElementsByTagName('nombre')[0].firstChild.nodeValue
-                
-                # ? validate state
-                instance_state = instance_tag.getElementsByTagName('estado')[0].firstChild.nodeValue
-                
-                # ? parse to datetime
-                instance_start_date = instance_tag.getElementsByTagName('fechaInicio')[0].firstChild.nodeValue
-                
-                # ? parse to datetime
-                # ? None if not exists
-                # instance_end_date = instance_tag.getElementsByTagName('fechaFinal')[0].firstChild.nodeValue
-                instance_end_date = None
+            instance_id = instance_tag.getAttribute('id')
+            instance_name = instance_tag.getElementsByTagName('nombre')[0].firstChild.nodeValue
+            
+            # ? validate state
+            instance_state = instance_tag.getElementsByTagName('estado')[0].firstChild.nodeValue
+            
+            # ? parse to datetime
+            instance_start_date = instance_tag.getElementsByTagName('fechaInicio')[0].firstChild.nodeValue
+            
+            # ? parse to datetime
+            # ? None if not exists
+            # instance_end_date = instance_tag.getElementsByTagName('fechaFinal')[0].firstChild.nodeValue
+            instance_end_date = None
 
-                # search configuration
-                instance_configuration_id = instance_tag.getElementsByTagName('idConfiguracion')[0].firstChild.nodeValue
-                instance_configuration = cls.searchById("configurations", instance_configuration_id)
+            # search configuration
+            instance_configuration_id = instance_tag.getElementsByTagName('idConfiguracion')[0].firstChild.nodeValue
+            instance_configuration = cls.searchById("configurations", instance_configuration_id)
 
-                if instance_configuration == None:
-                    continue
+            if instance_configuration == None:
+                continue
 
-                # search consumption -> special search
-                instance_consupmtions = cls.searchById("consumptions", instance_id)
+            # search consumption -> special search
+            instance_consupmtions = cls.searchById("consumptions", instance_id)
 
 
-                cls.tables["instances"].append(Instance(instance_id, instance_configuration, instance_name, instance_start_date, instance_state, instance_end_date,instance_consupmtions))
+            cls.tables["instances"].append(Instance(instance_id, instance_configuration, instance_name, instance_start_date, instance_state, instance_end_date,instance_consupmtions))
 
         # * Fill clients table
 
@@ -205,33 +202,89 @@ class Orm ():
 
     @classmethod
     def save(cls):
-        pass
+        dbRoot = ET.Element('db')
 
+        # * Save resources table
+        resources_root = ET.SubElement(dbRoot, 'listaRecursos')
 
-    # def _add_to_db_file(self, object:ModelType):
+        for resource in cls.tables["resources"]:
+            resource_root = ET.SubElement(resources_root, 'recurso')
+            resource_root.set('id', resource.id_)
+            ET.SubElement(resource_root, 'nombre').text = resource.name
+            ET.SubElement(resource_root, 'abreviatura').text = resource.abreviation
+            ET.SubElement(resource_root, 'metrica').text = resource.metric
+            ET.SubElement(resource_root, 'tipo').text = resource.type
+            ET.SubElement(resource_root, 'valorXhora').text = str(resource.value_per_hour)
 
+        # * Save configurations table
+        configurationsRoot = ET.SubElement(dbRoot, 'listaConfiguraciones')
 
-    #     domTree = None
-    #     try:
-    #         project_path = os.path.dirname(os.path.abspath(__file__))
-    #         db_path = os.path.join(project_path, 'backend', 'app', 'db','db.xml')
-    #         print(db_path)
+        for configuration in cls.tables["configurations"]:
+            configuration_root = ET.SubElement(configurationsRoot, 'configuracion')
+            configuration_root.set('id', configuration.id_)
+            ET.SubElement(configuration_root, 'nombre').text = configuration.name
+            ET.SubElement(configuration_root, 'descripcion').text = configuration.description
+            for resource_config in configuration.resources:
+                configuration_resource_root = ET.SubElement(configuration_root, 'recursoConfiguracion')
+                configuration_resource_root.set('id', resource_config.resource.id_)
+                configuration_resource_root.text = str(resource_config.quantity)
 
-    #         domTree = xml.dom.minidom.parse(db_path)
-    #     except:
-    #         domTree = None
+        # * Save categories table
+        categoriesRoot = ET.SubElement(dbRoot, 'listaCategorias')
 
-    #         if domTree == None:
-    #             raise FileNotFound
-                        
-    #         if isinstance(object, Resource):
-    #             pass
-    #         else:
-    #             raise InvalidObject
-        
-    # def _add_text(self, file, tag, text):
-    #     newScriptText = file.createTextNode( text )
-    #     tag.appendChild( newScriptText  )
+        for category in cls.tables["categories"]:
+            categoryRoot = ET.SubElement(categoriesRoot, 'categoria')
+            categoryRoot.set('id', category.id_)
+            ET.SubElement(categoryRoot, 'nombre').text = category.name
+            ET.SubElement(categoryRoot, 'descripcion').text = category.description
+            ET.SubElement(categoryRoot, 'cargaTrabajo').text = category.work_load
+            for configuration in category.configurations:
+                configuration_root = ET.SubElement(categoryRoot, 'configuracionCategoria')
+                configuration_root.set('id', configuration.id_)
 
-    # def _parse_to_object(self,table:DBTables):
-    #     pass
+        # * Save consumptions table
+        consumptionsRoot = ET.SubElement(dbRoot, 'listaConsumos')
+
+        for consumption in cls.tables["consumptions"]:
+            consumptionRoot = ET.SubElement(consumptionsRoot, 'consumo')
+            consumptionRoot.set('nitCliente', consumption.client_nit)
+            consumptionRoot.set('idInstancia', consumption.instance_id)
+            ET.SubElement(consumptionRoot, 'tiempo').text = str(consumption.time)
+            # ? parse to string
+            ET.SubElement(consumptionRoot, 'fechaHora').text = consumption.date
+
+        # * Save instances table
+        instancesRoot = ET.SubElement(dbRoot, 'listaInstancias')
+
+        for instance in cls.tables["instances"]:
+            instanceRoot = ET.SubElement(instancesRoot, 'instancia')
+            instanceRoot.set('id', instance.id_)
+            ET.SubElement(instanceRoot, 'idConfiguracion').text = instance.configuration.id_
+            ET.SubElement(instanceRoot, 'nombre').text = instance.name
+            ET.SubElement(instanceRoot, 'fechaInicio').text = instance.init_date
+            ET.SubElement(instanceRoot, 'estado').text = instance.state
+            ET.SubElement(instanceRoot, 'fechaFinal').text = instance.end_date
+
+        # * Save clients table
+
+        clientsRoot = ET.SubElement(dbRoot, 'listaClientes')
+
+        for client in cls.tables["clients"]:
+            clientRoot = ET.SubElement(clientsRoot, 'cliente')
+            clientRoot.set('nit', client.nit)
+            ET.SubElement(clientRoot, 'nombre').text = client.name
+            ET.SubElement(clientRoot, 'usuario').text = client.username
+            ET.SubElement(clientRoot, 'clave').text = client.password
+            ET.SubElement(clientRoot, 'direccion').text = client.direction
+            ET.SubElement(clientRoot, 'correoElectronico').text = client.email
+
+            for instance in client.instances:
+                instanceRoot = ET.SubElement(clientRoot, 'instanciaCliente')
+                instanceRoot.set('id', instance.id_)
+
+        # * Delete old file
+        if os.path.exists(cls.DB_FILE_PATH):
+            os.remove(cls.DB_FILE_PATH)
+
+        tree = ET.ElementTree(dbRoot)
+        tree.write(cls.DB_FILE_PATH,encoding='UTF-8',xml_declaration=True)
