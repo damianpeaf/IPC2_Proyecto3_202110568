@@ -1,6 +1,6 @@
-import json
 from flask import Blueprint, jsonify, request
-from ..controller import fetch_all_data, create_resource, create_category, create_configuration, create_client, create_instance, create_consumption
+
+from ..controller import read_configuration_file,fetch_all_data, create_resource, create_category, create_configuration, create_client, create_instance, create_consumption
 
 default_routes = Blueprint("main", __name__)
 
@@ -42,4 +42,10 @@ def create_consumption_():
     res = create_consumption(request.json)
     
     return jsonify(res)
+
+@default_routes.route('/mensajeConfiguracion', methods=['POST'])
+def configuration_message_():
+    resp = read_configuration_file(request.files)
+    return jsonify(resp)
+
 

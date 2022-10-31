@@ -11,3 +11,6 @@ class FileNotFound(Exception):
 
 class IdRegisteredError(Exception):
     pass
+
+class OverwriteRegisterError(Exception):
+    pass

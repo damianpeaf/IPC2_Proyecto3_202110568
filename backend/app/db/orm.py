@@ -4,7 +4,7 @@ import xml.dom.minidom
 
 import xml.etree.ElementTree as ET
 from ..models import Resource, Instance, Category, Client, Configuration, Consumption, ResourceConfiguration
-from .error import IdRegisteredError
+from .error import IdRegisteredError, OverwriteRegisterError
 
 
 ModelType =  Resource | Instance | Category | Client | Configuration | Consumption
@@ -27,16 +27,33 @@ class Orm ():
         pass
 
     @classmethod
-    def create(cls, table_name:str, object:ModelType):
+    def create(cls, table_name:str, object:ModelType, overwrite = False):
         # special create for: consumptions
         if table_name == "consumptions":
             cls.tables[table_name].append(object) 
-            return 
+            return
+
+        if table_name == "clients":
+            for item in cls.tables[table_name]:
+                if item.nit == object.nit:
+                    if overwrite:
+                        cls.tables[table_name].remove(item)
+                        cls.tables[table_name].append(object) 
+                        raise OverwriteRegisterError(f'El cliente con nit {object.nit} se ha sobreescrito')
+                    else:
+                        raise IdRegisteredError(f'Nit {object.nit} ya registrada')
+
+            cls.tables[table_name].append(object)
+            return
 
         for item in cls.tables[table_name]:
             if item.id_ == object.id_:
-                raise IdRegisteredError(f'Id {object.id_} ya registrada')
-                return 
+                if overwrite:
+                    cls.tables[table_name].remove(item)
+                    cls.tables[table_name].append(object) 
+                    raise OverwriteRegisterError(f'El objeto con id {object.id_} se ha sobreescrito')
+                else:
+                    raise IdRegisteredError(f'Id {object.id_} ya registrada')
 
         cls.tables[table_name].append(object) 
 
@@ -180,18 +197,12 @@ class Orm ():
                 
             instance_id = instance_tag.getAttribute('id')
             instance_name = instance_tag.getElementsByTagName('nombre')[0].firstChild.nodeValue
-            
-            # ? validate state
             instance_state = instance_tag.getElementsByTagName('estado')[0].firstChild.nodeValue
-            
-            # ? parse to datetime
             instance_start_date = instance_tag.getElementsByTagName('fechaInicio')[0].firstChild.nodeValue
             
-            # ? parse to datetime
-            # ? None if not exists
-            # instance_end_date = instance_tag.getElementsByTagName('fechaFinal')[0].firstChild.nodeValue
-            instance_end_date = None
-
+            instance_end_date = instance_tag.getElementsByTagName('fechaFinal')[0].firstChild.nodeValue
+            instance_end_date = instance_end_date if instance_end_date != '-' else  None
+            
             # search configuration
             instance_configuration_id = instance_tag.getElementsByTagName('idConfiguracion')[0].firstChild.nodeValue
             instance_configuration = cls.searchById("configurations", instance_configuration_id)
@@ -296,7 +307,7 @@ class Orm ():
             ET.SubElement(instanceRoot, 'nombre').text = instance.name
             ET.SubElement(instanceRoot, 'fechaInicio').text = instance.init_date
             ET.SubElement(instanceRoot, 'estado').text = instance.state
-            ET.SubElement(instanceRoot, 'fechaFinal').text = instance.end_date
+            ET.SubElement(instanceRoot, 'fechaFinal').text = instance.end_date if instance.end_date else "-"
 
         # * Save clients table
 

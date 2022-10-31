@@ -5,3 +5,4 @@ from .create_configuration import create_configuration
 from .create_client import create_client
 from .create_instance import create_instance
 from .create_consumption import create_consumption
+from .read_configuration_file import read_configuration_file
