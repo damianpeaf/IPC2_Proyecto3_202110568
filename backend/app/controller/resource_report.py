@@ -5,7 +5,7 @@ from typing import Dict
 from ..utils import get_value, parse_to_datetime,calculate_total_price_of_configuration
 from ..db import Orm
 
-def category_report(fields :Dict):
+def resource_report(fields :Dict):
 
     try:
         from_ = parse_to_datetime(get_value(fields, 'from', str))
@@ -19,19 +19,14 @@ def category_report(fields :Dict):
 
 
         report = {
-            "categories": [],
-            "configurations": []
+            "resources": [],
         }
 
         # fill dict
-        categories = Orm.tables['categories']
-        for category in categories:
-            report['categories'].append({"name" :category.name, "id": category.id_, "revenue": 0})
+        resources = Orm.tables['resources']
+        for resource in resources:
+            report['resources'].append({"name" :resource.name, "id": resource.id_, "revenue": 0})
         
-
-        configurations = Orm.tables['configurations']
-        for conf in configurations:
-            report['configurations'].append({"name" :conf.name, "id": conf.id_, "revenue": 0})
         
         consumptions = Orm.tables['consumptions']
         for consumption in consumptions:
@@ -42,18 +37,14 @@ def category_report(fields :Dict):
 
             hours = consumption.time
             configuration = Orm.searchById('instances', consumption.instance_id).configuration
-            category = Orm.search_category_by_configuration(configuration.id_)
-            total = calculate_total_price_of_configuration(configuration, hours)
+            
+            for detail in configuration.resources:
+                total =  round(detail.quantity,2) * round(detail.resource.value_per_hour,2) * round(hours,2)
 
-            for c in report['categories']:
-                if c["id"] == category.id_:
-                    c['revenue']+= total
-                    c['revenue'] =round(c['revenue'],2)
-
-            for c in report['configurations']:
-                if c["id"] == configuration.id_:
-                    c['revenue']+= total
-                    c['revenue'] =round(c['revenue'],2)
+                for r in report['resources']:
+                    if r["id"] == detail.resource.id_:
+                        r['revenue']+= total
+                        r['revenue'] =round(r['revenue'],2)
 
         return report
         
@@ -61,7 +52,6 @@ def category_report(fields :Dict):
         return {
             "msg": str(e)
         }
-
 
 class DateError(Exception):
     pass

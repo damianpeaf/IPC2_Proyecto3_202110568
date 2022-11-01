@@ -9,3 +9,4 @@ from .read_configuration_file import read_configuration_file
 from .read_consumption_file import  read_consumption_file
 from .cancel_instance import cancel_instance
 from .category_report import category_report
+from .resource_report import resource_report

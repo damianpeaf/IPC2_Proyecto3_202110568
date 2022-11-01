@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from ..controller import category_report
+from ..controller import category_report, resource_report
 report_routes = Blueprint("reports", __name__, url_prefix="/reporte")
 
 @report_routes.route('/factura', methods=['POST'])
@@ -9,7 +9,8 @@ def bill_report_():
 
 @report_routes.route('/recurso', methods=['POST'])
 def resource_report_():
-    return 'Tecnologías Chapinas, S.A API'
+    resp = resource_report(request.json)
+    return jsonify(resp)
 
 @report_routes.route('/categoria', methods=['POST'])
 def category_report_():
