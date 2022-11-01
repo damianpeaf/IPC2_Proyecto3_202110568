@@ -31,6 +31,9 @@ def generate_bill(fields):
                 if date < from_ or date > to_ :
                     continue
 
+                if consumption.is_canceled:
+                    continue
+
                 instance = Orm.searchById('instances', consumption.instance_id)
 
                 for resource_detail in instance.configuration.resources:
@@ -38,10 +41,10 @@ def generate_bill(fields):
 
                 consumption.is_canceled = True
 
-        bill = Bill(uuid.uuid1(), nit, datetime.now().strftime("%d/%m/%Y"),details)
+        bill = Bill(str(uuid.uuid1()), nit, datetime.now().strftime("%d/%m/%Y"),details)
         Orm.create('bills', bill)
         
-        #!!!! Orm.save()
+        Orm.save()
 
         return {
             "bill": asdict(bill)

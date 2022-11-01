@@ -45,6 +45,7 @@ def create_consumption_():
 
 @default_routes.route('/mensajeConfiguracion', methods=['POST'])
 def configuration_message_():
+    print(request.files)
     resp = read_configuration_file(request.files)
     return jsonify(resp)
 

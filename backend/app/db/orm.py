@@ -96,6 +96,21 @@ class Orm ():
         return None
 
     @classmethod
+    def reset(cls):
+        # * Reset tables
+
+        cls.tables = {
+            "resources" : [],
+            "configurations" : [],
+            "categories" : [],
+            "consumptions" : [],
+            "instances" : [],
+            "clients" : [],
+            "bills": []
+
+        }
+
+    @classmethod
     def init(cls):
 
         # * Reset tables
@@ -256,14 +271,14 @@ class Orm ():
 
             bills_details_tags = group.getElementsByTagName("detalle")
             for bill_detail_tag in bills_details_tags:
-                detail_resource_id = bill_tag.getAttribute('idRecurso')
-                detail_instance_id = bill_tag.getAttribute('idInstancia')
-                detail_quantity = bill_tag.getAttribute('cantidad')
-                detail_hours = bill_tag.getAttribute('tiempo')
+                detail_resource_id = bill_detail_tag.getAttribute('idRecurso')
+                detail_instance_id = bill_detail_tag.getAttribute('idInstancia')
+                detail_quantity = float(bill_detail_tag.getAttribute('cantidad'))
+                detail_hours = float( bill_detail_tag.getAttribute('tiempo'))
 
                 bill_details.append(BillDetail(detail_resource_id, detail_instance_id,detail_quantity, detail_hours))
 
-            bill = Bill(bill_id, bill_nit, bill_date, BillDetail)
+            bill = Bill(bill_id, bill_nit, bill_date, bill_details)
             cls.tables['bills'].append(bill)
 
         print('Se cargaron los datos correctamente')
@@ -358,14 +373,14 @@ class Orm ():
             billRoot.set('id', bill.id_)
             billRoot.set('nit', bill.nit)
             billRoot.set('fecha', bill.date)
-            billRoot.set('total', bill.total)
+            billRoot.set('total', str(bill.total))
 
             for detail in bill.detail:
                 detailRoot = ET.SubElement(billRoot, 'detalle')
                 detailRoot.set('idRecurso', detail.resource_id)
                 detailRoot.set('idInstancia', detail.instance_id)
-                detailRoot.set('cantidad', detail.quantity)
-                detailRoot.set('tiempo', detail.hours)
+                detailRoot.set('cantidad', str(detail.quantity))
+                detailRoot.set('tiempo', str(detail.hours))
 
         # * Delete old file
         if os.path.exists(cls.DB_FILE_PATH):
