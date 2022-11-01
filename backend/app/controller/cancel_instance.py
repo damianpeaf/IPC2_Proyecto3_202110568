@@ -9,7 +9,7 @@ class NotFoundError(Exception):
     pass
 
 def cancel_instance(fields:Dict):
-     try:
+    try:
         id_ = get_value(fields, 'id', str)
 
         final_date = datetime.now().strftime("%d/%m/%Y")
@@ -33,7 +33,7 @@ def cancel_instance(fields:Dict):
             "instance": asdict(instance)
         }
 
-     except Exception as e:
+    except Exception as e:
         return {
             'msg': str(e)
         }

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 
 from ..controller import category_report, resource_report
 report_routes = Blueprint("reports", __name__, url_prefix="/reporte")

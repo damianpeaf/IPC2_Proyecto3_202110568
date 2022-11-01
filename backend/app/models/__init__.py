@@ -4,3 +4,4 @@ from .configuration import Configuration, ResourceConfiguration
 from .consumption import Consumption
 from .instance import Instance
 from .resource import Resource
+from .bill import Bill, BillDetail

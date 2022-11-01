@@ -3,11 +3,11 @@ from typing import Dict, List
 import xml.dom.minidom
 
 import xml.etree.ElementTree as ET
-from ..models import Resource, Instance, Category, Client, Configuration, Consumption, ResourceConfiguration
+from ..models import Resource,Bill, BillDetail, Instance, Category, Client, Configuration, Consumption, ResourceConfiguration
 from .error import IdRegisteredError, OverwriteRegisterError
 
 
-ModelType =  Resource | Instance | Category | Client | Configuration | Consumption
+ModelType =  Resource | Instance | Category | Client | Configuration | Consumption |Bill| BillDetail
 
 
 class Orm ():
@@ -20,7 +20,8 @@ class Orm ():
         "categories" : [],
         "consumptions" : [],
         "instances" : [],
-        "clients" : []
+        "clients" : [],
+        "bills": []
     }
 
     def __init__(self) -> None:
@@ -106,6 +107,8 @@ class Orm ():
             "consumptions" : [],
             "instances" : [],
             "clients" : [],
+            "bills": []
+
         }
         
 
@@ -241,8 +244,29 @@ class Orm ():
 
             cls.tables["clients"].append(Client(client_nit, client_name, client_username, client_password, client_direction, client_email, client_instances))
 
+        # * Fill bill tables
+        bills_tags = group.getElementsByTagName("factura")
+        for bill_tag in bills_tags:
+            bill_id = bill_tag.getAttribute('id')
+            bill_nit = bill_tag.getAttribute('nit')
+            bill_date = bill_tag.getAttribute('fecha')
+            bill_total = bill_tag.getAttribute('total')
+
+            bill_details = []
+
+            bills_details_tags = group.getElementsByTagName("detalle")
+            for bill_detail_tag in bills_details_tags:
+                detail_resource_id = bill_tag.getAttribute('idRecurso')
+                detail_instance_id = bill_tag.getAttribute('idInstancia')
+                detail_quantity = bill_tag.getAttribute('cantidad')
+                detail_hours = bill_tag.getAttribute('tiempo')
+
+                bill_details.append(BillDetail(detail_resource_id, detail_instance_id,detail_quantity, detail_hours))
+
+            bill = Bill(bill_id, bill_nit, bill_date, BillDetail)
+            cls.tables['bills'].append(bill)
+
         print('Se cargaron los datos correctamente')
-                
 
     @classmethod
     def save(cls):
@@ -326,6 +350,22 @@ class Orm ():
             for instance in client.instances:
                 instanceRoot = ET.SubElement(clientRoot, 'instanciaCliente')
                 instanceRoot.set('id', instance.id_)
+
+        # * Save bills table
+        billsRoot = ET.SubElement(dbRoot, 'listaFacturas')
+        for bill in cls.tables["bills"]:
+            billRoot = ET.SubElement(billsRoot, 'factura')
+            billRoot.set('id', bill.id_)
+            billRoot.set('nit', bill.nit)
+            billRoot.set('fecha', bill.date)
+            billRoot.set('total', bill.total)
+
+            for detail in bill.detail:
+                detailRoot = ET.SubElement(billRoot, 'detalle')
+                detailRoot.set('idRecurso', detail.resource_id)
+                detailRoot.set('idInstancia', detail.instance_id)
+                detailRoot.set('cantidad', detail.quantity)
+                detailRoot.set('tiempo', detail.hours)
 
         # * Delete old file
         if os.path.exists(cls.DB_FILE_PATH):
