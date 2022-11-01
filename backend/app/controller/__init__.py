@@ -7,3 +7,5 @@ from .create_instance import create_instance
 from .create_consumption import create_consumption
 from .read_configuration_file import read_configuration_file 
 from .read_consumption_file import  read_consumption_file
+from .cancel_instance import cancel_instance
+from .category_report import category_report

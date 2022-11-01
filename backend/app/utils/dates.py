@@ -40,3 +40,29 @@ def eval_date_string(eval_date):
             return date_object.strftime("%d/%m/%Y")
         except:
             return None
+
+
+def parse_to_datetime(eval_date:str):
+    # regex for dd/mm/yyyy hh24:mi
+    match_date = re.search('[0-9]+/[0-9]+/[0-9]+ [0-9]+:[0-9]+', eval_date.replace('-', '/'))
+
+    if match_date is None:
+        match_date = re.search('[0-9]+/[0-9]+/[0-9]+', eval_date.replace('-', '/'))
+        if match_date is None:
+            return None
+
+    posible_date = match_date.group(0)
+
+    try:
+        return datetime.strptime(posible_date, "%d/%m/%Y %H:%M")
+    except:
+        try:
+            return datetime.strptime(posible_date, "%Y/%m/%d %H:%M")
+        except:
+            try:
+                return datetime.strptime(posible_date, "%d/%m/%Y")
+            except:
+                try:
+                    return datetime.strptime(posible_date, "%Y/%m/%d")
+                except:
+                    return None

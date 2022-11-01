@@ -45,7 +45,7 @@ def read_consumption_file(files : Dict):
             instance.consumptions.append(c)
             Orm.create('consumptions', c)
 
-        # Orm.save()
+        Orm.save()
 
         return {
             'msg': f'{str(len(consumptions_objects))} consumos procesados'

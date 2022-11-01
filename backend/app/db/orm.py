@@ -332,3 +332,12 @@ class Orm ():
 
         tree = ET.ElementTree(dbRoot)
         tree.write(cls.DB_FILE_PATH,encoding='UTF-8',xml_declaration=True)
+
+    @classmethod
+    def search_category_by_configuration(cls,id_):
+        for category in cls.tables['categories']:
+            for configuration in category.configurations:
+
+                if configuration.id_ == id_:
+                    return category
+    

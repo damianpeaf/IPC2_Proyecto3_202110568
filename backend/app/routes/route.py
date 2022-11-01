@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from ..controller import read_configuration_file,read_consumption_file, fetch_all_data, create_resource, create_category, create_configuration, create_client, create_instance, create_consumption
+from ..controller import read_configuration_file,read_consumption_file,cancel_instance, fetch_all_data, create_resource, create_category, create_configuration, create_client, create_instance, create_consumption
 
 default_routes = Blueprint("main", __name__)
 
@@ -53,3 +53,10 @@ def configuration_message_():
 def consumption_file_():
     resp = read_consumption_file(request.files)
     return jsonify(resp)
+
+
+@default_routes.route('/cancelarInstancia', methods=['POST'])
+def cancel_instance_():
+    resp = cancel_instance(request.json)
+    return jsonify(resp)
+
