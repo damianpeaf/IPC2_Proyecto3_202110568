@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: white;
+    }
+</style>
+
+<h1>Factura</h1>
+
+
+<h3>Nit : {{ nit }}</h3>
+<h3>Fecha : {{ date }}</h3>
+<h3>No. : {{ correlative }}</h3>
+<h3>Total : {{ total }}</h3>
+
+
+
+<h2>Detalle por instancia</h2>
+<br><br>
+{% for intance in intances %}
+<table border="1">
+    <tr>
+        <td>ID INSTANCIA</td>
+        <td colspan="4">Nombre</td>
+        <td>Sub total instancia</td>
+    </tr>
+    <tr>
+        <td>{{ intance['instance_id'] }}</td>
+        <td colspan="4">{{ intance['instance_name'] }}</td>
+        <td>{{ intance['subtotal'] }}</td>
+    </tr>
+
+    <tr>
+        <td colspan="6" align="center">DETALLE DE RECURSOS:</td>
+    </tr>
+
+    <tr>
+        <td>ID Recurso</td>
+        <td>Nombre recurso</td>
+        <td>Cantidad</td>
+        <td>Horas utilizadas</td>
+        <td>Costo por hora</td>
+        <td>subtotal recurso</td>
+    </tr>
+
+    {% for resource in intance['consumptions'] %}
+    <tr>
+        <td>{{ resource['resource_id'] }}</td>
+        <td>{{ resource['resource_name'] }}</td>
+        <td>{{ resource['resource_quantity'] }}</td>
+        <td>{{ resource['hours_used'] }}</td>
+        <td>{{ resource['value_per_hour'] }}</td>
+        <td>{{ resource['subtotal'] }}</td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+        <td colspan="5" align="right"> Total por instancia</td>
+        <td>{{ intance['subtotal'] }}</td>
+    </tr>
+</table>
+<br>
+<br>
+{% endfor %}
+
+
+<h2>Total a pagar {{ total }}</h2>
+
+<h2>Detalle de consumos</h2>
+
+<table border="1">
+    <tr>
+        <td>Id recurso</td>
+        <td>Id instancia</td>
+        <td>Cantidad de recurso</td>
+        <td>Horas de uso</td>
+        <td>Fecha</td>
+    </tr>
+    {% for consumption in consumptions %}
+    <tr>
+        <td>{{consumption["resource_id"]}}</td>
+        <td>{{consumption["instance_id"]}}</td>
+        <td>{{consumption["quantity"]}}</td>
+        <td>{{consumption["hours"]}}</td>
+        <td>{{consumption["date"]}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Total a pagar {{ total }}</h2>
+
+{% endblock %}

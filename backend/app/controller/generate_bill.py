@@ -37,7 +37,7 @@ def generate_bill(fields):
                 instance = Orm.searchById('instances', consumption.instance_id)
 
                 for resource_detail in instance.configuration.resources:
-                    details.append(BillDetail(resource_detail.resource.id_,instance.id_, resource_detail.quantity, consumption.time))
+                    details.append(BillDetail(resource_detail.resource.id_,instance.id_, resource_detail.quantity, consumption.time, consumption.date))
 
                 consumption.is_canceled = True
 

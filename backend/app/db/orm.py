@@ -269,14 +269,16 @@ class Orm ():
 
             bill_details = []
 
-            bills_details_tags = group.getElementsByTagName("detalle")
+            bills_details_tags = bill_tag.getElementsByTagName("detalle")
             for bill_detail_tag in bills_details_tags:
                 detail_resource_id = bill_detail_tag.getAttribute('idRecurso')
                 detail_instance_id = bill_detail_tag.getAttribute('idInstancia')
                 detail_quantity = float(bill_detail_tag.getAttribute('cantidad'))
                 detail_hours = float( bill_detail_tag.getAttribute('tiempo'))
+                detail_date = bill_detail_tag.getAttribute('fecha')
 
-                bill_details.append(BillDetail(detail_resource_id, detail_instance_id,detail_quantity, detail_hours))
+
+                bill_details.append(BillDetail(detail_resource_id, detail_instance_id,detail_quantity, detail_hours,detail_date))
 
             bill = Bill(bill_id, bill_nit, bill_date, bill_details)
             cls.tables['bills'].append(bill)
@@ -381,6 +383,8 @@ class Orm ():
                 detailRoot.set('idInstancia', detail.instance_id)
                 detailRoot.set('cantidad', str(detail.quantity))
                 detailRoot.set('tiempo', str(detail.hours))
+                detailRoot.set('fecha', str(detail.date))
+
 
         # * Delete old file
         if os.path.exists(cls.DB_FILE_PATH):

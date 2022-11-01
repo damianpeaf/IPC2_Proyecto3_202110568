@@ -11,3 +11,4 @@ from .cancel_instance import cancel_instance
 from .category_report import category_report
 from .resource_report import resource_report
 from .generate_bill import generate_bill
+from .bill_report import bill_report

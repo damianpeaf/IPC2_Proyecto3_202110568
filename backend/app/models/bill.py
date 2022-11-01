@@ -10,12 +10,7 @@ class BillDetail():
     instance_id : str
     quantity:float
     hours : float
-    def __post_init__(self):
-        # from ..db import Orm
-        # self.resource = Orm.searchById('resources', self.resource_id)
-        # self.instance = Orm.searchById('instances', self.instance_id)
-        pass
-
+    date : str
 @dataclass
 class Bill():
     id_ : str
@@ -37,7 +32,9 @@ class Bill():
             create = True
 
             subtotal = resource.value_per_hour * detail.quantity * detail.hours
-            total += round(subtotal,2)
+            subtotal = round(subtotal,2 )
+            total += subtotal
+            total = round(total, 2)
 
             # check if is already registered
             for i in self.instance_detail:
