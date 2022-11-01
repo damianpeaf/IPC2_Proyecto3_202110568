@@ -4,7 +4,7 @@ from .db.orm import Orm
 from .routes import default_routes, report_routes
 
 # Init app
-app = Flask(__name__)
+app = Flask(__name__, static_folder='views/static', template_folder='views/templates')
 
 # Blueprint
 

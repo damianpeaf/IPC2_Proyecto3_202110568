@@ -1,8 +1,10 @@
 
 
 from typing import Dict
+from flask import make_response, render_template, jsonify
+import pdfkit
 
-from ..utils import get_value, parse_to_datetime,calculate_total_price_of_configuration
+from ..utils import get_value, parse_to_datetime
 from ..db import Orm
 
 def resource_report(fields :Dict):
@@ -46,12 +48,18 @@ def resource_report(fields :Dict):
                         r['revenue']+= total
                         r['revenue'] =round(r['revenue'],2)
 
-        return report
+        rendered = render_template('resources_report.html', title='Reporte', resources=report['resources'])
+        pdf = pdfkit.from_string(rendered, False)
+
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'attachment;filename=report.pdf'
+        return response
         
     except Exception as e:
-        return {
+        return jsonify({
             "msg": str(e)
-        }
+        })
 
 class DateError(Exception):
     pass

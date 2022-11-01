@@ -7,3 +7,4 @@ class Consumption():
     instance_id : str   
     time: float
     date: str
+    is_canceled : bool = False

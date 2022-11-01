@@ -10,9 +10,9 @@ def bill_report_():
 @report_routes.route('/recurso', methods=['POST'])
 def resource_report_():
     resp = resource_report(request.json)
-    return jsonify(resp)
+    return resp
 
 @report_routes.route('/categoria', methods=['POST'])
 def category_report_():
     resp = category_report(request.json)
-    return jsonify(resp)
+    return resp

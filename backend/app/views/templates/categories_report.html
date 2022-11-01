@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<h1>Reporte de Categorias y Configuraciones</h1>
+
+
+<h2>Categorias</h2>
+<table>
+    <tr>
+        <td>ID</td>
+        <td>Nombre</td>
+        <td>Ganancias</td>
+    </tr>
+    {% for category in categories %}
+    <tr>
+        <td>{{ category['id'] }}</td>
+        <td>{{ category['name'] }}</td>
+        <td>{{ category['revenue'] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Configuraciones</h2>
+<table>
+    <tr>
+        <td>ID</td>
+        <td>Nombre</td>
+        <td>Ganancias</td>
+    </tr>
+    {% for configuration in configurations %}
+    <tr>
+        <td>{{ configuration['id'] }}</td>
+        <td>{{ configuration['name'] }}</td>
+        <td>{{ configuration['revenue'] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

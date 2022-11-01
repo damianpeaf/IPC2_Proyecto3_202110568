@@ -184,10 +184,10 @@ class Orm ():
             consumption_client_nit = consumption_tag.getAttribute('nitCliente')
             consumption_instance_id = consumption_tag.getAttribute('idInstancia')
             consumption_time = float(consumption_tag.getElementsByTagName('tiempo')[0].firstChild.nodeValue)
-            # ? parse to datetime
             consumption_date = consumption_tag.getElementsByTagName('fechaHora')[0].firstChild.nodeValue
+            consumptions_is_canceled = True if consumption_tag.getElementsByTagName('cancelado')[0].firstChild.nodeValue == 'si' else False
 
-            cls.tables["consumptions"].append(Consumption(consumption_client_nit, consumption_instance_id, consumption_time, consumption_date))
+            cls.tables["consumptions"].append(Consumption(consumption_client_nit, consumption_instance_id, consumption_time, consumption_date,consumptions_is_canceled))
 
 
         # * Fill instances table
@@ -294,8 +294,9 @@ class Orm ():
             consumptionRoot.set('nitCliente', consumption.client_nit)
             consumptionRoot.set('idInstancia', consumption.instance_id)
             ET.SubElement(consumptionRoot, 'tiempo').text = str(consumption.time)
-            # ? parse to string
             ET.SubElement(consumptionRoot, 'fechaHora').text = consumption.date
+            ET.SubElement(consumptionRoot, 'cancelado').text = "si" if consumption.is_canceled else "no"
+
 
         # * Save instances table
         instancesRoot = ET.SubElement(dbRoot, 'listaInstancias')
