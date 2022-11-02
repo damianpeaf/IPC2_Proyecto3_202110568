@@ -25,6 +25,10 @@ def cancel_instance(fields:Dict):
         if instance == None:
             raise NotFoundError(f'Instancia con la id {id_} no encontrada')
 
+        if instance.end_date != None:
+            raise NotFoundError(f'Instancia con la id {id_} ya esta cancelada')
+
+
         instance.end_date = final_date
         instance.state = "Cancelada"
 
