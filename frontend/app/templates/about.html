@@ -9,9 +9,13 @@
 </head>
 
 <body>
+    <a href="{% url 'index' %}">Regresar al inicio</a>
     <h2>Damián Ignacio Peña Afre</h2>
     <h2>202110568</h2>
     <h3>FIUSAC</h3>
+    {% load static %}
+
+    <iframe style="width: 100%; min-height: 70vh;" src="{% static 'documentacion.pdf' %}" frameborder="0"></iframe>
 </body>
 
 </html>

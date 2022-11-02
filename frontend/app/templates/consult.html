@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+<body>
+    <a href="{% url 'index' %}">Regresar al inicio</a>
+
+    <h1>Datos registrados</h1>
+
+    <hr>
+    <hr>
+
+    <h1>CATEGORIAS</h1>
+    {% for category in data.categories %}
+
+    <h2>DATOS CATEGORIA:</h2>
+    <h3>Id: {{ category.id_ }}</h3>
+    <h3>Nombre: {{ category.name }}</h3>
+    <h4>Carga de trabajo: {{ category.work_load }}</h4>
+    <p>Descripcion: {{ category.description }}</p>
+    <br>
+
+    {% endfor %}
+    <hr>
+    <hr>
+
+    <h1>CONFIGURACIONES</h1>
+    {% for config in data.configurations %}
+
+    <h2>DATOS CONFIGURACION:</h2>
+    <h3>ID: {{ config.id_ }}</h3>
+    <h3>Nombre: {{ config.name }}</h3>
+    <h3>Descripcion: {{ config.description }}</h3>
+    <br>
+
+    {% endfor %}
+    <hr>
+    <hr>
+
+    <h1>RECURSOS</h1>
+    {% for resource in data.resources %}
+
+    <h2>DATOS RECURSO:</h2>
+    <h3>ID: {{ resource.id_ }}</h3>
+    <h3>Nombre: {{ resource.name }}</h3>
+    <h3>Tipo: {{ resource.type }}</h3>
+    <h3>Abreviacion : {{ resource.abreviation }}</h3>
+    <h3>Metrica: {{ resource.metric }}</h3>
+    <h3>Valor por hora: {{ resource.value_per_hour }}</h3>
+    <br>
+
+    {% endfor %}
+    <hr>
+    <hr>
+
+    <h1>CLIENTES</h1>
+    {% for client in data.clients %}
+
+    <hr>
+    <h2>DATOS CLIENTE:</h2>
+    <h3>Nit: {{ client.nit }}</h3>
+    <h3>Nombre: {{ client.name }}</h3>
+    <h3>Direccion: {{ client.direction }}</h3>
+    <h3>Email: {{ client.email }}</h3>
+    <h3>Username: {{ client.username }}</h3>
+    <h2>INSTANCIAS ASOCIADAS</h2>
+    <br>
+    {% for instance in client.instances %}
+    <h3>INSTANCIA</h3>
+    <h3>ID: {{ instance.id_ }}</h3>
+    <h3>Nombre: {{ instance.name }}</h3>
+    <h3>Estado: {{ instance.state }}</h3>
+    <h3>Fecha de inicio: {{ instance.init_date }}</h3>
+    <h3>Fecha de finalizacion: {{ instance.end_date }}</h3>
+    <br>
+    <h4>CONSUMOS ASOCIADOS</h4>
+    <br>
+    {% for consumption in instance.consumptions %}
+    <h4>fecha: {{ consumption.date }}</h4>
+    <h4>tiempo: {{ consumption.time }}</h4>
+    <h4>cancelado: {{ consumption.is_canceled }}</h4>
+    <br>
+    {% endfor %}
+    {% endfor %}
+    <hr>
+    {% endfor %}
+    <hr>
+    <hr>
+
+
+
+
+</body>
+
+</html>

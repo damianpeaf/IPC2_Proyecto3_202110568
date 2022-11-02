@@ -10,6 +10,21 @@
 
 <body>
     <h2>Envio de archivo de consumos</h2>
+    {% if form.is_multipart %}
+    <form enctype="multipart/form-data" method="post">
+        {% else %}
+        <form method="post" action="/foo/">
+            {% endif %}
+            {{ form }}
+            {% csrf_token %}
+            <input type="submit" value="Enviar archivo">
+        </form>
+
+        {% if msg %}
+        <p>{{ msg }}</p>
+        {% endif %}
+        <a href="{% url 'index' %}">Regresar al inicio</a>
+
 </body>
 
 </html>
