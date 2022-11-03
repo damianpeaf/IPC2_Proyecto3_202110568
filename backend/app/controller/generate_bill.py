@@ -7,7 +7,7 @@ from ..db import Orm
 from ..models import Bill, BillDetail
 def generate_bill(fields):
     try:
-        from_ = parse_to_datetime(get_value(fields, 'from', str))
+        from_ = parse_to_datetime(get_value(fields, 'from_', str))
         to_ = parse_to_datetime(get_value(fields, 'to', str))
         nit = get_value(fields, 'nit', str)
 
@@ -47,7 +47,8 @@ def generate_bill(fields):
         Orm.save()
 
         return {
-            "bill": asdict(bill)
+            "bill": asdict(bill),
+            "msg": "Factura generada con exito"
         }
 
     except Exception as e:

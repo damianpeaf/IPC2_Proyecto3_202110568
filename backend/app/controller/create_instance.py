@@ -43,7 +43,7 @@ def create_instance(fields:Dict):
         Orm.save()
 
         return {
-            'msg': 'Cliente creado exitosamente',
+            'msg': 'Instancia creada exitosamente',
             'instance': asdict(new_instance)
         }
 

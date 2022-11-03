@@ -1,0 +1,166 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="db">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="listaRecursos">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="recurso">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" name="nombre" />
+                                        <xs:element type="xs:string" name="abreviatura" />
+                                        <xs:element type="xs:string" name="metrica" />
+                                        <xs:element type="xs:string" name="tipo" />
+                                        <xs:element type="xs:float" name="valorXhora" />
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:short" name="id" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="listaConfiguraciones">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="configuracion">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" name="nombre" />
+                                        <xs:element type="xs:string" name="descripcion" />
+                                        <xs:element name="recursoConfiguracion">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:float">
+                                                        <xs:attribute type="xs:short" name="id" />
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:byte" name="id" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="listaCategorias">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="categoria">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" name="nombre" />
+                                        <xs:element type="xs:string" name="descripcion" />
+                                        <xs:element type="xs:string" name="cargaTrabajo" />
+                                        <xs:element name="configuracionCategoria">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                        <xs:attribute type="xs:byte" name="id" />
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:short" name="id" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="listaConsumos">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="consumo">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:float" name="tiempo" />
+                                        <xs:element type="xs:string" name="fechaHora" />
+                                        <xs:element type="xs:string" name="cancelado" />
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:long" name="nitCliente" />
+                                    <xs:attribute type="xs:short" name="idInstancia" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="listaInstancias">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="instancia">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:byte" name="idConfiguracion" />
+                                        <xs:element type="xs:string" name="nombre" />
+                                        <xs:element type="xs:string" name="fechaInicio" />
+                                        <xs:element type="xs:string" name="estado" />
+                                        <xs:element type="xs:byte" name="fechaFinal" />
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:short" name="id" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="listaClientes">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="cliente">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" name="nombre" />
+                                        <xs:element type="xs:string" name="usuario" />
+                                        <xs:element type="xs:byte" name="clave" />
+                                        <xs:element type="xs:string" name="direccion" />
+                                        <xs:element type="xs:string" name="correoElectronico" />
+                                        <xs:element name="instanciaCliente">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                        <xs:attribute type="xs:short" name="id" />
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:long" name="nit" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="listaFacturas">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="factura">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="detalle">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                        <xs:attribute type="xs:short" name="idRecurso" />
+                                                        <xs:attribute type="xs:short" name="idInstancia" />
+                                                        <xs:attribute type="xs:float" name="cantidad" />
+                                                        <xs:attribute type="xs:float" name="tiempo" />
+                                                        <xs:attribute type="xs:string" name="fecha" />
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:string" name="id" />
+                                    <xs:attribute type="xs:long" name="nit" />
+                                    <xs:attribute type="xs:string" name="fecha" />
+                                    <xs:attribute type="xs:float" name="total" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
